@@ -9,13 +9,14 @@ export const articleApi = createApi({
         prepareHeaders: (headers) => { //sets the keys and host in "headers"
             headers.set('X-RapidAPI-Key', rapidApiKey);
             headers.set('X-RapidAPI-Host', 'article-extractor-and-summarizer.p.rapidapi.com');
-
             return headers;
         }
     }),
     endpoints: (builder) => ({ //getting the endpoint for our summaryAPI
         getSummary: builder.query({ //establishing api function getSummary
-            query: (params) => 'test'
+            query: (params) => `/summarize?url=${encodeURIComponent(params.articleUrl)}&length=3` //filled according to RapidAPI /summarize parameters (length hardcoded to 4)
         })
     })
 });
+
+export const { useLazyGetSummaryQuery } = articleApi; //fire on demand (useLazyGetSummaryQuery) vs fire once loaded (useGetSummaryQuery)

@@ -1,15 +1,29 @@
 import { useState, useEffect} from 'react';
 import { copy, linkIcon, loader, tick } from '../assets';
+import { useLazyGetSummaryQuery } from '../services/article';
 
 const Demo = () => {
-  //logic for url link
+  //logic for url link (hooks)
   const [article, setArticle] = useState({
     url: '',
     summary:'',
   });
+
+  const [getSummary, {error, isFetching}] = useLazyGetSummaryQuery(); //do we have an error or is fetching
+
+  
   
   const handleSubmit = async (e) => { //handles the async event that is clicking the enter button
-    alert('Submitted!'); 
+    e.preventDefault(); //prevents browser from reloading on text-box change
+    const { data } = await getSummary({
+      articleUrl: article.url
+    })
+    if(data?.summary){
+      const newArticle = { ... article, summary: data.summary}
+      setArticle(newArticle);
+
+      console.log(newArticle); //prints status of article for debugging.
+    }
   }
 
   return (
