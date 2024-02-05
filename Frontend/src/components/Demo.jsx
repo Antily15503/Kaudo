@@ -10,8 +10,14 @@ const Demo = () => {
   });
 
   const [getSummary, {error, isFetching}] = useLazyGetSummaryQuery(); //do we have an error or is fetching
+  useEffect(() => { //adds any storage from localStorage to our AllArticles website array
+    const articlesFromLocalStorage = JSON.parse(localStorage.getItem('articles'))
+    if (articlesFromLocalStorage){
+      setAllArticles (articlesFromLocalStorage)
+    }
+  }, []); //uses callback function and dependency array, which executes when the page loads (since array is empty)
 
-  
+  const [allArticles, setAllArticles] = useState([]); //stores any articles that are made into the allArticles array
   
   const handleSubmit = async (e) => { //handles the async event that is clicking the enter button
     e.preventDefault(); //prevents browser from reloading on text-box change
@@ -20,9 +26,11 @@ const Demo = () => {
     })
     if(data?.summary){
       const newArticle = { ... article, summary: data.summary}
+      const updatedAllArticles = [newArticle, ...allArticles];
       setArticle(newArticle);
-
+      setAllArticles(updatedAllArticles); //setAllArticles to the new array updatedAllArticles
       console.log(newArticle); //prints status of article for debugging.
+      localStorage.setItem('articles', JSON.stringify(updatedAllArticles)) //stores all articles into local storage as JSON strings
     }
   }
 
@@ -51,8 +59,52 @@ const Demo = () => {
           </button>
         </form>
       {/*Browse URL History - Which URLs have been seen */}
+      <div className="flex flex-col gap-1 max-h-60 overflow-y-auto" //overflow = we can scroll down
+      > 
+        {allArticles.map((item, index) => (
+          <div
+            key={`link-${index}`}
+            onClick={() => setArticle(item)}
+            className="link_card">
+              <div className="copy_btn">
+                <img
+                src={copy}
+                alt="copy_icon"
+                className="w-[40%] h0[40%] object-contain"/>
+              </div>
+              <p className="flex-1 font-satoshi text-blue-700 font-medium text-sm truncate">
+                {item.url}
+              </p>
+          </div>
+        ))}
       </div>
+    </div>
+
       {/*Displaying results */}
+      <div className="my-10 max-w-full flex justify-center items-center">
+        {isFetching ? ( //if it is currently fetching
+          <img src={loader} alt="loader" className="w-20 h-20 object-contain"/>
+        ) : error ? ( //if an error has occured
+          <p className="font-inter font-bold text-black text-center">
+            That wasn't supposed to happen! Whoops...
+            <br/>
+            <span className="font-satoshi font-normal text-gray-700">
+              {error?.data?.error}
+            </span>
+          </p>
+        ) : ( //we found an article!!
+          article.summary && (
+            <div className="flex flex-col gap-3">
+              <h2 className="font-satoshi font-bold text-gray-600 text-xl">
+                Article <span className="blue_gradient">Summary</span>
+              </h2>
+              <div className="summary_box">
+                <p>{article.summary}</p>
+              </div>
+            </div>
+          )
+        )}
+      </div>
 
     </section>
   )
