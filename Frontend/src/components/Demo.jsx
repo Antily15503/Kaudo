@@ -10,7 +10,7 @@ const Demo = () => {
   });
 
   const [getSummary, {error, isFetching}] = useLazyGetSummaryQuery(); //do we have an error or is fetching
-  useEffect(() => { //adds any storage from localStorage to our AllArticles website array
+  useEffect(() => {                                                                  //adds any storage from localStorage to our AllArticles website array
     const articlesFromLocalStorage = JSON.parse(localStorage.getItem('articles'))
     if (articlesFromLocalStorage){
       setAllArticles (articlesFromLocalStorage)
